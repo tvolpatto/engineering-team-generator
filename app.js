@@ -1,7 +1,12 @@
-var rxjs = require("rxjs");
 var inquirer = require("inquirer");
+const Manager = require("./manager");
+const Intern = require("./intern");
+const Engineer = require("./engineer");
 
-var prompts = new rxjs.Subject();
+const team =[];
+const POS_MANAGER = "Manager";
+const POS_ENGINEER = "Engineer";
+const POS_INTERN = "Intern";
 
 const questions = [{
     type: "input",
@@ -14,30 +19,13 @@ const questions = [{
     name: "id" 
   }
 ];
-const manQuestion =  {
-  type: "number",
-  message: "What´s the office number?",
-  name: "office" 
-};
 
-const engQuestion = {
-  type: "input",
-  message: "What´s his/her GitHub username?",
-  name: "github" 
-};
-
-const intQuestion =  {
-  type: "input",
-  message: "What´s his/her school name?",
-  name: "school" 
-};
-
-const  positionQuestion = [
+var  positionQuestion = [
   {
     type: "list",
     message: "Who do you want to add?",
     name: "position",
-    choices: ["Manager","Engineer", "Intern", "My team is complete!"]  
+    choices: [POS_MANAGER, POS_ENGINEER, POS_INTERN, "My team is complete!"]  
   }
 ];
 
@@ -53,13 +41,13 @@ function callPositionQuestion() {
   inquirer.prompt(positionQuestion).then(function(answer) {     
     
     switch (answer.position) {
-      case "Manager" :
+      case POS_MANAGER :
         callManagerQuestion();
         break;
-      case "Engineer" :
+      case POS_ENGINEER :
         callEngineerQuestion();
         break;
-      case "Intern" :
+      case POS_INTERN :
         callInternQuestion();
         break;
       default :
@@ -72,26 +60,46 @@ function callPositionQuestion() {
 }
 
 function callManagerQuestion() {
-  setupQuestions(manQuestion);
-  callQuestions();
+  positionQuestion.choices.splice(0, 1);
+  setupQuestions({type: "number", message: "What´s the office number?", name: "office"});
+  callQuestions(POS_MANAGER);
 }
 
 function callEngineerQuestion() {
-  setupQuestions(engQuestion);
-  callQuestions();
+  setupQuestions({type: "input", message: "What´s his/her GitHub username?", name: "github"});
+  callQuestions(POS_ENGINEER);
 }
 
 function callInternQuestion() {
-  setupQuestions(intQuestion);
-  callQuestions();
+  setupQuestions({type: "input", message: "What´s his/her school name?", name: "school"});
+  callQuestions(POS_INTERN);
 }
 
-function callQuestions() {
+function callQuestions(position) {
   inquirer.prompt(questions).then(function(answers) { 
+    createTeamMember(position, answers);
     callPositionQuestion();
   }).catch(function (err) {
     console.log(err);
   });
+}
+
+function createTeamMember(position, ans) {
+  const member = {};
+  
+  switch (position) {
+    case POS_MANAGER :
+      member = new Manager(ans.name, ans.id, ans.email, ans.office);
+      break;
+    case POS_ENGINEER :
+      member = new Engineer(ans.name, ans.id, ans.email, ans.github);
+      break;
+    case POS_INTERN :
+      member = new Intern(ans.name, ans.id, ans.email, ans.school);
+      break;
+  }
+  team.push(member);
+
 }
 
 function createPage() {
