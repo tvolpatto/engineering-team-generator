@@ -16,7 +16,16 @@ const questions = [{
   {
     type: "number",
     message: "What´s team member id?",
-    name: "id" 
+    name: "id",
+    validate: function(value) {
+      const exist = team.filter(t =>{ if (t.id === value) return true });
+      
+      if (!exist) {
+        return true;
+      }
+
+      return `${value} already in use! Please select another ID.`;
+    } 
   }
 ];
 
