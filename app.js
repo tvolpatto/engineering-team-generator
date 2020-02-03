@@ -20,12 +20,16 @@ const questions = [{
     validate: function(value) {
       const exist = team.filter(t =>{ if (t.id === value) return true });
       
-      if (exist.length === 0) {
+      if( isNaN(parseInt(value))) {
+        return  'Please enter a Integer number';
+      } else if (exist.length === 0) {
         return true;
+      } else {
+        return `${value} already in use! Please select another ID.`;
+
       }
 
-      return `${value} already in use! Please select another ID.`;
-    } 
+    }
   }
 ];
 
