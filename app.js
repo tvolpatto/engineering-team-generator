@@ -1,7 +1,7 @@
 var inquirer = require("inquirer");
-const Manager = require("./manager");
-const Intern = require("./intern");
-const Engineer = require("./engineer");
+const Manager = require("./lib/manager");
+const Intern = require("./lib/intern");
+const Engineer = require("./lib/engineer");
 
 const team =[];
 const POS_MANAGER = "Manager";
@@ -20,7 +20,7 @@ const questions = [{
     validate: function(value) {
       const exist = team.filter(t =>{ if (t.id === value) return true });
       
-      if (!exist) {
+      if (exist.length === 0) {
         return true;
       }
 
@@ -69,7 +69,7 @@ function callPositionQuestion() {
 }
 
 function callManagerQuestion() {
-  positionQuestion.choices.splice(0, 1);
+  positionQuestion[0].choices.splice(0, 1);
   setupQuestions({type: "number", message: "What´s the office number?", name: "office"});
   callQuestions(POS_MANAGER);
 }
@@ -94,7 +94,7 @@ function callQuestions(position) {
 }
 
 function createTeamMember(position, ans) {
-  const member = {};
+  var member = {};
   
   switch (position) {
     case POS_MANAGER :
@@ -112,7 +112,7 @@ function createTeamMember(position, ans) {
 }
 
 function createPage() {
-
+  console.log(team);
 }
 
 function init() {
