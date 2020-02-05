@@ -8,31 +8,6 @@ const POS_MANAGER = "Manager";
 const POS_ENGINEER = "Engineer";
 const POS_INTERN = "Intern";
 
-const questions = [{
-    type: "input",
-    message: "What´s the team member´s name?",
-    name: "name" 
-  },
-  {
-    type: "number",
-    message: "What´s team member id?",
-    name: "id",
-    validate: function(value) {
-      const exist = team.filter(t =>{ if (t.id === value) return true });
-      
-      if( isNaN(parseInt(value))) {
-        return  'Please enter a Integer number';
-      } else if (exist.length === 0) {
-        return true;
-      } else {
-        return `${value} already in use! Please select another ID.`;
-
-      }
-
-    }
-  }
-];
-
 var  positionQuestion = [
   {
     type: "list",
@@ -42,12 +17,25 @@ var  positionQuestion = [
   }
 ];
 
-function setupQuestions(teamMbrQst) {
-  if(questions.length > 2 ){
-    questions[2] = teamMbrQst;
-  } else {
-    questions.push(teamMbrQst);
-  }
+function setupQuestions(position, specificQuestion) {
+  return [{
+      type: "input",
+      message: `What´s the ${position}´s name?`,
+      name: "name" 
+    },
+    {
+      type: "number",
+      message: `What´s the ${position}´s id?`,
+      name: "id",
+      validate: validateId 
+    },
+    {
+      type: "input",
+      message: "What´s his/her email address?",
+      name: "email" 
+    },
+    specificQuestion
+  ];      
 }
 
 function callPositionQuestion() {
@@ -74,21 +62,21 @@ function callPositionQuestion() {
 
 function callManagerQuestion() {
   positionQuestion[0].choices.splice(0, 1);
-  setupQuestions({type: "number", message: "What´s the office number?", name: "office"});
-  callQuestions(POS_MANAGER);
+  const managerQstn = {type: "number", message: "What´s the Manager office number?", name: "office"};
+  callQuestions(POS_MANAGER, setupQuestions(POS_MANAGER, managerQstn));
 }
 
 function callEngineerQuestion() {
-  setupQuestions({type: "input", message: "What´s his/her GitHub username?", name: "github"});
-  callQuestions(POS_ENGINEER);
+  const engineerQstn = {type: "input", message: "What´s the Engineer GitHub username?", name: "github"};
+  callQuestions(POS_ENGINEER, setupQuestions(POS_ENGINEER, engineerQstn));
 }
 
 function callInternQuestion() {
-  setupQuestions({type: "input", message: "What´s his/her school name?", name: "school"});
-  callQuestions(POS_INTERN);
+  const internQstn = {type: "input", message: "What´s the Intern school name?", name: "school"};
+  callQuestions(POS_INTERN,  setupQuestions(POS_INTERN, internQstn));
 }
 
-function callQuestions(position) {
+function callQuestions(position, questions) {
   inquirer.prompt(questions).then(function(answers) { 
     createTeamMember(position, answers);
     callPositionQuestion();
@@ -113,6 +101,18 @@ function createTeamMember(position, ans) {
   }
   team.push(member);
 
+}
+
+function validateId(value) {
+  const exist = team.filter(t =>{ if (t.id === value) return true });
+  
+  if( isNaN(parseInt(value))) {
+    return  'Please enter a Integer number';
+  } else if (exist.length === 0) {
+    return true;
+  } else {
+    return `${value} already in use! Please select another ID.`;
+  }
 }
 
 function createPage() {
