@@ -1,12 +1,11 @@
-var inquirer = require("inquirer");
-var fs = require('fs');
+const inquirer = require("inquirer");
+const fs = require('fs');
 const Manager = require("./lib/manager");
 const Intern = require("./lib/intern");
 const Engineer = require("./lib/engineer");
 const util = require("util");
 
 const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
 
 const team =[];
 const POS_MANAGER = "Manager";
@@ -21,6 +20,10 @@ var  positionQuestion = [
     choices: [POS_MANAGER, POS_ENGINEER, POS_INTERN, "My team is complete!"]  
   }
 ];
+
+const fillTemplate = function(templateString, variables){
+  return new Function("return `"+templateString +"`;").call(variables);
+}
 
 function setupQuestions(position, specificQuestion) {
   return [{
@@ -105,7 +108,6 @@ function createTeamMember(position, ans) {
       break;
   }
   team.push(member);
-
 }
 
 function validateId(value) {
@@ -121,17 +123,30 @@ function validateId(value) {
 }
 
 function createHTML() {
-  
   readFileAsync("./templates/main.html", "utf8").then(function(data) {
-   
-    var newData = data.replace("MANAGER_DATA","BLA BLA");
-    console.log(newData);
-    fs.writeFile("./output/index.html", newData, function(err) {
-       if (err) {
-         return console.log(err);
-       }
-       
-     });
+    readFileAsync("./templates/manager.html", "utf8").then(function(managerDiv) {
+      var manager  = filterTeamByPosition(POS_MANAGER);
+      data = data.replace("MANAGER_DATA", fillTemplate(managerDiv, manager[0]));
+
+      writeHTML(data);
+    });
+  });
+}
+
+function filterTeamByPosition(position) {
+  return team.filter((t) => {
+    if (t.getRole() === position) {
+      return t;
+    }
+  });     
+}
+
+function writeHTML(data) {
+  fs.writeFile("./output/index.html", data, function(err) {
+    if (err) {
+      return console.log(err);
+    }
+    
   });
 }
 
