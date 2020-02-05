@@ -1,7 +1,12 @@
 var inquirer = require("inquirer");
+var fs = require('fs');
 const Manager = require("./lib/manager");
 const Intern = require("./lib/intern");
 const Engineer = require("./lib/engineer");
+const util = require("util");
+
+const readFileAsync = util.promisify(fs.readFile);
+const writeFileAsync = util.promisify(fs.writeFile);
 
 const team =[];
 const POS_MANAGER = "Manager";
@@ -52,7 +57,7 @@ function callPositionQuestion() {
         callInternQuestion();
         break;
       default :
-        createPage();
+        createHTML();
         break;   
     }
   }).catch(function (err) {
@@ -115,8 +120,19 @@ function validateId(value) {
   }
 }
 
-function createPage() {
-  console.log(team);
+function createHTML() {
+  
+  readFileAsync("./templates/main.html", "utf8").then(function(data) {
+   
+    var newData = data.replace("MANAGER_DATA","BLA BLA");
+    console.log(newData);
+    fs.writeFile("./output/index.html", newData, function(err) {
+       if (err) {
+         return console.log(err);
+       }
+       
+     });
+  });
 }
 
 function init() {
