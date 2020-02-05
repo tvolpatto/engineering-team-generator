@@ -9,12 +9,11 @@ const readFileAsync = util.promisify(fs.readFile);
 
 const team =[];
 
-
-var  positionQuestion = [
+var  roleQuestion = [
   {
     type: "list",
     message: "Who do you want to add?",
-    name: "position",
+    name: "role",
     choices: [Manager.ROLE, Engineer.ROLE, Intern.ROLE, "My team is complete!"]  
   }
 ];
@@ -23,15 +22,15 @@ const fillTemplate = function(templateString, variables){
   return new Function("return `"+templateString +"`;").call(variables);
 }
 
-function setupQuestions(position, specificQuestion) {
+function getQuestions(clazz) {
   return [{
       type: "input",
-      message: `What´s the ${position}´s name?`,
+      message: `What´s the ${clazz.ROLE}´s name?`,
       name: "name" 
     },
     {
       type: "number",
-      message: `What´s the ${position}´s id?`,
+      message: `What´s the ${clazz.ROLE}´s id?`,
       name: "id",
       validate: validateId 
     },
@@ -40,22 +39,22 @@ function setupQuestions(position, specificQuestion) {
       message: "What´s his/her email address?",
       name: "email" 
     },
-    specificQuestion
+    clazz.QUESTION
   ];      
 }
 
-function callPositionQuestion() {
-  inquirer.prompt(positionQuestion).then(function(answer) {     
-    
-    switch (answer.position) {
+function callRoleQuestion() {
+  inquirer.prompt(roleQuestion).then(function(answer) {        
+    switch (answer.role) {
       case Manager.ROLE :
-        callManagerQuestion();
+        callQuestions(Manager.ROLE, getQuestions(Manager));
+        roleQuestion[0].choices.splice(0, 1);
         break;
       case Engineer.ROLE :
-        callEngineerQuestion();
+        callQuestions(Engineer.ROLE, getQuestions(Engineer));
         break;
       case Intern.ROLE :
-        callInternQuestion();
+        callQuestions(Intern.ROLE, getQuestions(Intern));
         break;
       default :
         createHTML();
@@ -66,36 +65,19 @@ function callPositionQuestion() {
   });
 }
 
-// TODO: try my idea to eliminate 2 of the 3 call Question methods
-function callManagerQuestion() {
-  positionQuestion[0].choices.splice(0, 1);
-  const managerQstn = {type: "number", message: "What´s the Manager office number?", name: "office"};
-  callQuestions(Manager.ROLE, setupQuestions(Manager.ROLE, managerQstn));
-}
-
-function callEngineerQuestion() {
-  const engineerQstn = {type: "input", message: "What´s the Engineer GitHub username?", name: "github"};
-  callQuestions(Engineer.ROLE, setupQuestions(Engineer.ROLE, engineerQstn));
-}
-
-function callInternQuestion() {
-  const internQstn = {type: "input", message: "What´s the Intern school name?", name: "school"};
-  callQuestions(Intern.ROLE,  setupQuestions(Intern.ROLE, internQstn));
-}
-
-function callQuestions(position, questions) {
+function callQuestions(role, questions) {
   inquirer.prompt(questions).then(function(answers) { 
-    createTeamMember(position, answers);
-    callPositionQuestion();
+    createTeamMember(role, answers);
+    callRoleQuestion();
   }).catch(function (err) {
     console.log(err);
   });
 }
 
-function createTeamMember(position, ans) {
+function createTeamMember(role, ans) {
   var member = {};
   
-  switch (position) {
+  switch (role) {
     case Manager.ROLE :
       member = new Manager(ans.name, ans.id, ans.email, ans.office);
       break;
@@ -125,19 +107,19 @@ function validateId(value) {
 function createHTML() {
   readFileAsync("./templates/main.html", "utf8").then(function(data) {
     readFileAsync(Manager.TEMPLATE, "utf8").then(function(managerTemplate) {
-      var manager  = filterTeamByPosition(Manager.ROLE);
+      var manager  = filterTeamByRole(Manager.ROLE);
       var manDiv ='';   
       manager.forEach((man) =>{  manDiv += fillTemplate(managerTemplate, man);} );   
       data = data.replace(Manager.HTML_PLACEHOLDER, manDiv);
 
       readFileAsync(Engineer.TEMPLATE, "utf8").then(function(engTemplate) {
-        var engineers  = filterTeamByPosition(Engineer.ROLE);
+        var engineers  = filterTeamByRole(Engineer.ROLE);
         var engDiv ='';
         engineers.forEach((eng) =>{ engDiv += fillTemplate(engTemplate, eng);} );   
         data = data.replace(Engineer.HTML_PLACEHOLDER, engDiv);
   
         readFileAsync(Intern.TEMPLATE, "utf8").then(function(intTemplate) {
-          var interns  = filterTeamByPosition(Intern.ROLE);
+          var interns  = filterTeamByRole(Intern.ROLE);
           var intDiv ='';
           interns.forEach((int) =>{ intDiv += fillTemplate(intTemplate, int);} );   
           data = data.replace(Intern.HTML_PLACEHOLDER, intDiv);
@@ -149,9 +131,9 @@ function createHTML() {
   });
 }
 
-function filterTeamByPosition(position) {
+function filterTeamByRole(role) {
   return team.filter((t) => {
-    if (t.getRole() === position) {
+    if (t.getRole() === role) {
       return t;
     }
   });     
@@ -167,7 +149,7 @@ function writeHTML(data) {
 }
 
 function init() {
-  callPositionQuestion();
+  callRoleQuestion();
 }
 
 init();
