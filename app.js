@@ -103,32 +103,21 @@ function validateId(value) {
   }
 }
 
-// TODO: Refactor this method 
 function createHTML() {
   readFileAsync("./templates/main.html", "utf8").then(function(data) {
-    readFileAsync(Manager.TEMPLATE, "utf8").then(function(managerTemplate) {
-      var manager  = filterTeamByRole(Manager.ROLE);
-      var manDiv ='';   
-      manager.forEach((man) =>{  manDiv += fillTemplate(managerTemplate, man);} );   
-      data = data.replace(Manager.HTML_PLACEHOLDER, manDiv);
-
-      readFileAsync(Engineer.TEMPLATE, "utf8").then(function(engTemplate) {
-        var engineers  = filterTeamByRole(Engineer.ROLE);
-        var engDiv ='';
-        engineers.forEach((eng) =>{ engDiv += fillTemplate(engTemplate, eng);} );   
-        data = data.replace(Engineer.HTML_PLACEHOLDER, engDiv);
-  
-        readFileAsync(Intern.TEMPLATE, "utf8").then(function(intTemplate) {
-          var interns  = filterTeamByRole(Intern.ROLE);
-          var intDiv ='';
-          interns.forEach((int) =>{ intDiv += fillTemplate(intTemplate, int);} );   
-          data = data.replace(Intern.HTML_PLACEHOLDER, intDiv);
-    
-          writeHTML(data);
-        });
-      });
-    });
+    writeHTML(addTemplate([Manager, Engineer, Intern], data));        
   });
+}
+
+function addTemplate(classes, data){
+  classes.forEach((clazz) => {
+    var template = fs.readFileSync(clazz.TEMPLATE, "utf8");
+    const members  = filterTeamByRole(clazz.ROLE);
+    var div ='';
+    members.forEach((m) =>{ div += fillTemplate(template, m) } );   
+    data = data.replace(clazz.HTML_PLACEHOLDER, div);
+  });
+  return data;
 }
 
 function filterTeamByRole(role) {
