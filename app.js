@@ -66,6 +66,7 @@ function callPositionQuestion() {
   });
 }
 
+// TODO: try my idea to eliminate 2 of the 3 call Question methods
 function callManagerQuestion() {
   positionQuestion[0].choices.splice(0, 1);
   const managerQstn = {type: "number", message: "What´s the Manager office number?", name: "office"};
@@ -120,6 +121,7 @@ function validateId(value) {
   }
 }
 
+// TODO: Refactor this method 
 function createHTML() {
   readFileAsync("./templates/main.html", "utf8").then(function(data) {
     readFileAsync(Manager.TEMPLATE, "utf8").then(function(managerTemplate) {
