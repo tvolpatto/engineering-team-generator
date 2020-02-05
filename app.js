@@ -25,7 +25,6 @@ const fillTemplate = function(templateString, variables){
   return new Function("return `"+templateString +"`;").call(variables);
 }
 
-
 function setupQuestions(position, specificQuestion) {
   return [{
       type: "input",
@@ -135,7 +134,14 @@ function createHTML() {
         engineers.forEach((eng) =>{ engDiv += fillTemplate(engTemplate, eng);} );   
         data = data.replace("ENGINEER_DATA",engDiv);
   
-        writeHTML(data);
+        readFileAsync("./templates/intern.html", "utf8").then(function(intTemplate) {
+          var interns  = filterTeamByPosition(POS_INTERN);
+          var intDiv ='';
+          interns.forEach((int) =>{ intDiv += fillTemplate(intTemplate, int);} );   
+          data = data.replace("INTERN_DATA",intDiv);
+    
+          writeHTML(data);
+        });
       });
     });
   });
