@@ -25,6 +25,7 @@ const fillTemplate = function(templateString, variables){
   return new Function("return `"+templateString +"`;").call(variables);
 }
 
+
 function setupQuestions(position, specificQuestion) {
   return [{
       type: "input",
@@ -128,7 +129,14 @@ function createHTML() {
       var manager  = filterTeamByPosition(POS_MANAGER);
       data = data.replace("MANAGER_DATA", fillTemplate(managerDiv, manager[0]));
 
-      writeHTML(data);
+      readFileAsync("./templates/engineer.html", "utf8").then(function(engTemplate) {
+        var engineers  = filterTeamByPosition(POS_ENGINEER);
+        var engDiv ='';
+        engineers.forEach((eng) =>{ engDiv += fillTemplate(engTemplate, eng);} );   
+        data = data.replace("ENGINEER_DATA",engDiv);
+  
+        writeHTML(data);
+      });
     });
   });
 }
