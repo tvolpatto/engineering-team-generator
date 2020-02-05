@@ -8,16 +8,14 @@ const util = require("util");
 const readFileAsync = util.promisify(fs.readFile);
 
 const team =[];
-const POS_MANAGER = "Manager";
-const POS_ENGINEER = "Engineer";
-const POS_INTERN = "Intern";
+
 
 var  positionQuestion = [
   {
     type: "list",
     message: "Who do you want to add?",
     name: "position",
-    choices: [POS_MANAGER, POS_ENGINEER, POS_INTERN, "My team is complete!"]  
+    choices: [Manager.ROLE, Engineer.ROLE, Intern.ROLE, "My team is complete!"]  
   }
 ];
 
@@ -50,13 +48,13 @@ function callPositionQuestion() {
   inquirer.prompt(positionQuestion).then(function(answer) {     
     
     switch (answer.position) {
-      case POS_MANAGER :
+      case Manager.ROLE :
         callManagerQuestion();
         break;
-      case POS_ENGINEER :
+      case Engineer.ROLE :
         callEngineerQuestion();
         break;
-      case POS_INTERN :
+      case Intern.ROLE :
         callInternQuestion();
         break;
       default :
@@ -71,17 +69,17 @@ function callPositionQuestion() {
 function callManagerQuestion() {
   positionQuestion[0].choices.splice(0, 1);
   const managerQstn = {type: "number", message: "What´s the Manager office number?", name: "office"};
-  callQuestions(POS_MANAGER, setupQuestions(POS_MANAGER, managerQstn));
+  callQuestions(Manager.ROLE, setupQuestions(Manager.ROLE, managerQstn));
 }
 
 function callEngineerQuestion() {
   const engineerQstn = {type: "input", message: "What´s the Engineer GitHub username?", name: "github"};
-  callQuestions(POS_ENGINEER, setupQuestions(POS_ENGINEER, engineerQstn));
+  callQuestions(Engineer.ROLE, setupQuestions(Engineer.ROLE, engineerQstn));
 }
 
 function callInternQuestion() {
   const internQstn = {type: "input", message: "What´s the Intern school name?", name: "school"};
-  callQuestions(POS_INTERN,  setupQuestions(POS_INTERN, internQstn));
+  callQuestions(Intern.ROLE,  setupQuestions(Intern.ROLE, internQstn));
 }
 
 function callQuestions(position, questions) {
@@ -97,13 +95,13 @@ function createTeamMember(position, ans) {
   var member = {};
   
   switch (position) {
-    case POS_MANAGER :
+    case Manager.ROLE :
       member = new Manager(ans.name, ans.id, ans.email, ans.office);
       break;
-    case POS_ENGINEER :
+    case Engineer.ROLE :
       member = new Engineer(ans.name, ans.id, ans.email, ans.github);
       break;
-    case POS_INTERN :
+    case Intern.ROLE :
       member = new Intern(ans.name, ans.id, ans.email, ans.school);
       break;
   }
@@ -124,21 +122,23 @@ function validateId(value) {
 
 function createHTML() {
   readFileAsync("./templates/main.html", "utf8").then(function(data) {
-    readFileAsync("./templates/manager.html", "utf8").then(function(managerDiv) {
-      var manager  = filterTeamByPosition(POS_MANAGER);
-      data = data.replace("MANAGER_DATA", fillTemplate(managerDiv, manager[0]));
+    readFileAsync(Manager.TEMPLATE, "utf8").then(function(managerTemplate) {
+      var manager  = filterTeamByPosition(Manager.ROLE);
+      var manDiv ='';   
+      manager.forEach((man) =>{  manDiv += fillTemplate(managerTemplate, man);} );   
+      data = data.replace(Manager.HTML_PLACEHOLDER, manDiv);
 
-      readFileAsync("./templates/engineer.html", "utf8").then(function(engTemplate) {
-        var engineers  = filterTeamByPosition(POS_ENGINEER);
+      readFileAsync(Engineer.TEMPLATE, "utf8").then(function(engTemplate) {
+        var engineers  = filterTeamByPosition(Engineer.ROLE);
         var engDiv ='';
         engineers.forEach((eng) =>{ engDiv += fillTemplate(engTemplate, eng);} );   
-        data = data.replace("ENGINEER_DATA",engDiv);
+        data = data.replace(Engineer.HTML_PLACEHOLDER, engDiv);
   
-        readFileAsync("./templates/intern.html", "utf8").then(function(intTemplate) {
-          var interns  = filterTeamByPosition(POS_INTERN);
+        readFileAsync(Intern.TEMPLATE, "utf8").then(function(intTemplate) {
+          var interns  = filterTeamByPosition(Intern.ROLE);
           var intDiv ='';
           interns.forEach((int) =>{ intDiv += fillTemplate(intTemplate, int);} );   
-          data = data.replace("INTERN_DATA",intDiv);
+          data = data.replace(Intern.HTML_PLACEHOLDER, intDiv);
     
           writeHTML(data);
         });
