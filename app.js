@@ -68,6 +68,8 @@ function callRoleQuestion() {
 function callQuestions(role, questions) {
   inquirer.prompt(questions).then(function(answers) { 
     createTeamMember(role, answers);
+    console.log("-----------------------------------");
+    console.log("Member added to the team! Who is next?");
     callRoleQuestion();
   }).catch(function (err) {
     console.log(err);
