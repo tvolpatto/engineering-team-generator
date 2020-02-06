@@ -18,6 +18,7 @@ npm install
 node app.js
 ```
  
+![Running the app](https://github.com/tvolpatto/engineering-team-generator/blob/master/extras/gif/team-profile.gif)
 
  ## Dependencies
 
