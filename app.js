@@ -104,6 +104,8 @@ function validateId(value) {
 }
 
 function createHTML() {
+  console.log("-----------------------------------");
+  console.log("Alright! Now we'll build your team profile page...");
   readFileAsync("./templates/main.html", "utf8").then(function(data) {
     writeHTML(addTemplate([Manager, Engineer, Intern], data));        
   });
@@ -129,15 +131,19 @@ function filterTeamByRole(role) {
 }
 
 function writeHTML(data) {
+  
   fs.writeFile("./output/index.html", data, function(err) {
     if (err) {
       return console.log(err);
     }
-    
+    console.log("-----------------------------------");
+    console.log(`All done! To see it, access: ${__dirname}\\output\\index.html`);
   });
 }
 
 function init() {
+  console.log("-----------------------------------");
+  console.log("Let's build our team! So tell me...");
   callRoleQuestion();
 }
 
