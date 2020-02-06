@@ -18,6 +18,7 @@ var roleQuestion = [
   }
 ];
 
+//https://stackoverflow.com/questions/30003353/can-es6-template-literals-be-substituted-at-runtime-or-reused
 const fillTemplate = function (templateString, variables) {
   return new Function("return `" + templateString + "`;").call(variables);
 }
