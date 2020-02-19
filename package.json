@@ -7,6 +7,12 @@
     "lib": "lib",
     "test": "test"
   },
+  "babel": {
+    "plugins": [
+      "syntax-class-properties",
+      "transform-class-properties"
+    ]
+  },
   "scripts": {
     "test": "jest --verbose test/*"
   },
@@ -21,6 +27,8 @@
   },
   "homepage": "https://github.com/stevetrilogy/unit10hw#readme",
   "dependencies": {
+    "babel-plugin-syntax-class-properties": "^6.13.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "inquirer": "^6.3.1"
   },
   "devDependencies": {
